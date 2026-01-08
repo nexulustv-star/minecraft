@@ -1,22 +1,22 @@
--- Sistema de Monitoramento de Inventário para CC:Tweaked
+-- Sistema de Monitoramento de Inventario para CC:Tweaked
 -- Computador Principal
 
 local modem = peripheral.find("modem") or error("Nenhum modem encontrado")
 local monitorInventario = {}
 local config = {
-    ladoBaú = "top", -- Mude para o lado onde está o baú
+    ladoBau = "top", -- Mude para o lado onde esta o bau
     ladoMonitor = "right", -- Lado do monitor (se tiver um)
     intervaloAtualizacao = 5, -- Atualizar a cada 5 segundos
     maxItensPorPagina = 10,
-    nomeBaú = "Baú Principal de Armazenamento"
+    nomeBau = "Bau Principal de Armazenamento"
 }
 
 -- Inicializar o sistema
 function monitorInventario.inicializar()
-    -- Encontrar periféricos
-    monitorInventario.baú = peripheral.wrap(config.ladoBaú)
-    if not monitorInventario.baú then
-        print("Erro: Nenhum baú encontrado no lado " .. config.ladoBaú)
+    -- Encontrar perifericos
+    monitorInventario.bau = peripheral.wrap(config.ladoBau)
+    if not monitorInventario.bau then
+        print("Erro: Nenhum bau encontrado no lado " .. config.ladoBau)
         return false
     end
     
@@ -29,30 +29,30 @@ function monitorInventario.inicializar()
         print("Nenhum monitor encontrado, usando terminal")
     end
     
-    -- Abrir modem para comunicação de rede
+    -- Abrir modem para comunicacao de rede
     if modem then
         modem.open(12345) -- Abrir porta 12345
         print("Porta de rede 12345 aberta")
     end
     
-    print("Sistema de Monitoramento de Inventário Inicializado")
-    print("Baú: " .. config.nomeBaú)
-    print("Intervalo de Atualização: " .. config.intervaloAtualizacao .. " segundos")
+    print("Sistema de Monitoramento de Inventario Inicializado")
+    print("Bau: " .. config.nomeBau)
+    print("Intervalo de Atualizacao: " .. config.intervaloAtualizacao .. " segundos")
     return true
 end
 
--- Escanear baú e contar todos os itens
+-- Escanear bau e contar todos os itens
 function monitorInventario.escanearInventario()
     local itens = {}
     local contagemItens = {}
     local totalPilhas = 0
     local totalItens = 0
     
-    -- Obter conteúdo do baú
-    local conteudoBaú = monitorInventario.baú.list()
+    -- Obter conteudo do bau
+    local conteudoBau = monitorInventario.bau.list()
     
     -- Processar cada slot
-    for slot, item in pairs(conteudoBaú) do
+    for slot, item in pairs(conteudoBau) do
         local chaveItem = item.name .. ":" .. (item.damage or 0)
         
         if not itens[chaveItem] then
@@ -88,7 +88,7 @@ function monitorInventario.escanearInventario()
         totalPilhas = totalPilhas,
         totalItens = totalItens,
         dataHora = os.time(),
-        nomeBaú = config.nomeBaú
+        nomeBau = config.nomeBau
     }
 end
 
@@ -102,15 +102,15 @@ function monitorInventario.exibirResultados(dadosInventario, pagina)
         -- Exibir no monitor
         monitorInventario.monitor.clear()
         monitorInventario.monitor.setCursorPos(1, 1)
-        monitorInventario.monitor.write("=== " .. config.nomeBaú .. " ===")
+        monitorInventario.monitor.write("=== " .. config.nomeBau .. " ===")
         monitorInventario.monitor.setCursorPos(1, 2)
         monitorInventario.monitor.write("Total de Itens: " .. dadosInventario.totalItens)
         monitorInventario.monitor.setCursorPos(1, 3)
         monitorInventario.monitor.write("Total de Pilhas: " .. dadosInventario.totalPilhas)
         monitorInventario.monitor.setCursorPos(1, 4)
-        monitorInventario.monitor.write("Itens Únicos: " .. #dadosInventario.itens)
+        monitorInventario.monitor.write("Itens Unicos: " .. #dadosInventario.itens)
         monitorInventario.monitor.setCursorPos(1, 5)
-        monitorInventario.monitor.write("Página: " .. pagina .. "/" .. math.ceil(#dadosInventario.itens / config.maxItensPorPagina))
+        monitorInventario.monitor.write("Pagina: " .. pagina .. "/" .. math.ceil(#dadosInventario.itens / config.maxItensPorPagina))
         monitorInventario.monitor.setCursorPos(1, 6)
         monitorInventario.monitor.write(string.rep("=", 30))
         
@@ -134,11 +134,11 @@ function monitorInventario.exibirResultados(dadosInventario, pagina)
         -- Exibir no terminal
         term.clear()
         term.setCursorPos(1, 1)
-        print("=== " .. config.nomeBaú .. " ===")
+        print("=== " .. config.nomeBau .. " ===")
         print("Total de Itens: " .. dadosInventario.totalItens)
         print("Total de Pilhas: " .. dadosInventario.totalPilhas)
-        print("Itens Únicos: " .. #dadosInventario.itens)
-        print("Página: " .. pagina .. "/" .. math.ceil(#dadosInventario.itens / config.maxItensPorPagina))
+        print("Itens Unicos: " .. #dadosInventario.itens)
+        print("Pagina: " .. pagina .. "/" .. math.ceil(#dadosInventario.itens / config.maxItensPorPagina))
         print(string.rep("=", 50))
         
         for i = inicioIndice, fimIndice do
@@ -152,16 +152,16 @@ function monitorInventario.exibirResultados(dadosInventario, pagina)
         
         print(string.rep("=", 50))
         print("Atualizado: " .. os.date("%d/%m/%Y %H:%M:%S", dadosInventario.dataHora))
-        print("Pressione N/P para próxima/página anterior, Q para sair, R para atualizar")
+        print("Pressione N/P para proxima/pagina anterior, Q para sair, R para atualizar")
     end
 end
 
--- Enviar dados de inventário pela rede
+-- Enviar dados de inventario pela rede
 function monitorInventario.enviarAtualizacaoRede(dadosInventario)
     if modem then
         local dados = {
             tipo = "atualizacao_inventario",
-            nomeBaú = config.nomeBaú,
+            nomeBau = config.nomeBau,
             totalItens = dadosInventario.totalItens,
             totalPilhas = dadosInventario.totalPilhas,
             itensUnicos = #dadosInventario.itens,
@@ -169,7 +169,7 @@ function monitorInventario.enviarAtualizacaoRede(dadosInventario)
             itensAmostra = {}
         }
         
-        -- Incluir top 5 itens na transmissão
+        -- Incluir top 5 itens na transmissao
         for i = 1, math.min(5, #dadosInventario.itens) do
             table.insert(dados.itensAmostra, {
                 nome = dadosInventario.itens[i].nome,
@@ -186,12 +186,12 @@ function monitorInventario.exportarParaArquivo(dadosInventario)
     local nomeArquivo = "inventario_" .. os.date("%Y%m%d_%H%M%S") .. ".txt"
     local arquivo = fs.open(nomeArquivo, "w")
     
-    arquivo.writeLine("=== EXPORTAÇÃO DE INVENTÁRIO ===")
-    arquivo.writeLine("Baú: " .. config.nomeBaú)
+    arquivo.writeLine("=== EXPORTACAO DE INVENTARIO ===")
+    arquivo.writeLine("Bau: " .. config.nomeBau)
     arquivo.writeLine("Data/Hora: " .. os.date("%d/%m/%Y %H:%M:%S", dadosInventario.dataHora))
     arquivo.writeLine("Total de Itens: " .. dadosInventario.totalItens)
     arquivo.writeLine("Total de Pilhas: " .. dadosInventario.totalPilhas)
-    arquivo.writeLine("Itens Únicos: " .. #dadosInventario.itens)
+    arquivo.writeLine("Itens Unicos: " .. #dadosInventario.itens)
     arquivo.writeLine("")
     arquivo.writeLine("=== LISTA DE ITENS ===")
     
@@ -202,7 +202,7 @@ function monitorInventario.exportarParaArquivo(dadosInventario)
     end
     
     arquivo.close()
-    print("Inventário exportado para " .. nomeArquivo)
+    print("Inventario exportado para " .. nomeArquivo)
 end
 
 -- Loop principal de monitoramento
@@ -219,7 +219,7 @@ function monitorInventario.executar()
             monitorInventario.exibirResultados(dadosInventario, paginaAtual)
             monitorInventario.enviarAtualizacaoRede(dadosInventario)
             
-            -- Agendar próxima atualização
+            -- Agendar proxima atualizacao
             ultimoTempoEscaneamento = os.startTimer(config.intervaloAtualizacao)
             
         elseif evento == "key" then
@@ -227,13 +227,13 @@ function monitorInventario.executar()
             if param1 == keys.q then
                 break -- Sair
             elseif param1 == keys.n then
-                -- Próxima página
+                -- Proxima pagina
                 local dadosInventario = monitorInventario.escanearInventario()
                 local maxPaginas = math.ceil(#dadosInventario.itens / config.maxItensPorPagina)
                 paginaAtual = math.min(paginaAtual + 1, maxPaginas)
                 monitorInventario.exibirResultados(dadosInventario, paginaAtual)
             elseif param1 == keys.p then
-                -- Página anterior
+                -- Pagina anterior
                 paginaAtual = math.max(1, paginaAtual - 1)
                 local dadosInventario = monitorInventario.escanearInventario()
                 monitorInventario.exibirResultados(dadosInventario, paginaAtual)
@@ -263,7 +263,7 @@ function monitorInventario.executar()
             end
         end
         
-        -- Configuração inicial do timer
+        -- Configuracao inicial do timer
         if ultimoTempoEscaneamento == 0 then
             ultimoTempoEscaneamento = os.startTimer(0) -- Primeiro escaneamento imediato
         end
@@ -272,12 +272,12 @@ end
 
 -- Interface de linha de comando
 function monitorInventario.cli()
-    print("Sistema de Monitoramento de Inventário - CLI")
-    print("Comandos disponíveis:")
-    print("  escanear - Escanear e exibir inventário")
-    print("  exportar - Exportar inventário para arquivo")
-    print("  monitorar - Iniciar monitoramento contínuo")
-    print("  config - Mostrar configuração atual")
+    print("Sistema de Monitoramento de Inventario - CLI")
+    print("Comandos disponiveis:")
+    print("  escanear - Escanear e exibir inventario")
+    print("  exportar - Exportar inventario para arquivo")
+    print("  monitorar - Iniciar monitoramento continuo")
+    print("  config - Mostrar configuracao atual")
     print("  ajuda - Mostrar esta ajuda")
     print("  sair - Sair do programa")
     
@@ -294,12 +294,12 @@ function monitorInventario.cli()
             monitorInventario.exportarParaArquivo(dadosInventario)
             
         elseif comando == "monitorar" then
-            print("Iniciando monitoramento contínuo...")
-            print("Pressione Q para sair, N/P para próxima/página anterior")
+            print("Iniciando monitoramento continuo...")
+            print("Pressione Q para sair, N/P para proxima/pagina anterior")
             monitorInventario.executar()
             
         elseif comando == "config" then
-            print("Configuração Atual:")
+            print("Configuracao Atual:")
             for chave, valor in pairs(config) do
                 print("  " .. chave .. ": " .. tostring(valor))
             end
@@ -311,7 +311,7 @@ function monitorInventario.cli()
             break
             
         else
-            print("Comando desconhecido. Digite 'ajuda' para comandos disponíveis.")
+            print("Comando desconhecido. Digite 'ajuda' para comandos disponiveis.")
         end
     end
 end
@@ -324,5 +324,5 @@ if monitorInventario.inicializar() then
     print("  monitorInventario.escanearInventario() - Escanear uma vez")
     print("  monitorInventario.executar() - Iniciar monitoramento")
 else
-    print("Falha ao inicializar o sistema. Verifique os periféricos.")
+    print("Falha ao inicializar o sistema. Verifique os perifericos.")
 end
