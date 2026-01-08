@@ -53,7 +53,7 @@ while true do
     
     s.setTextColor(colors.date)
     s.setCursorPos(3, 7)
-    s.write("09 JAN 2024")
+    s.write("08 JAN 2024")
     
     s.setTextColor(colors.weather)
     s.setCursorPos(3, 9)
@@ -95,7 +95,7 @@ while true do
     
     s.setTextColor(colors.date)
     s.setCursorPos(22, 7)
-    s.write("10 JAN 2024")
+    s.write("09 JAN 2024")
     
     s.setTextColor(colors.purple)  -- Next day indicator
     s.setCursorPos(22, 8)
@@ -107,7 +107,7 @@ while true do
     
     s.setTextColor(colors.blue)  -- Different color for Russian temp
     s.setCursorPos(22, 10)
-    s.write("-8°C")
+    s.write("-12°C")
     
     s.setTextColor(colors.lightBlue)
     s.setCursorPos(22, 11)
