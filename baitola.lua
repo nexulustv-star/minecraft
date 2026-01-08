@@ -46,18 +46,6 @@ local rainbowColors = {
     colors.white
 }
 
--- Animation effects
-local effects = {
-    "bounce",
-    "scroll",
-    "rotate",
-    "rainbow",
-    "pulse",
-    "fireworks",
-    "typewriter",
-    "matrix"
-}
-
 -- Function to write to display
 local function writeToDisplay(x, y, text, color)
     if usingMonitor then
@@ -349,7 +337,7 @@ local function fireworksEffect()
     end
 end
 
--- 6. MATRIX EFFECT
+-- 6. MATRIX EFFECT (FIXED VERSION)
 local function matrixEffect()
     print("Starting MATRIX effect...")
     
@@ -385,9 +373,11 @@ local function matrixEffect()
                     
                     local char
                     if i == 0 then
-                        char = "VASYA"[math.random(1, 5)]
+                        char = string.sub("VASYA", math.random(1, 5), math.random(1, 5))
                     else
-                        char = chars:sub(math.random(1, #chars), math.random(1, #chars))
+                        local start = math.random(1, #chars)
+                        local finish = math.random(start, #chars)
+                        char = string.sub(chars, start, finish)
                     end
                     
                     local color
