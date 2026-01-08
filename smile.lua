@@ -1,84 +1,44 @@
--- wink.lua - Animated winking smiley
-term.clear()
-term.setCursorPos(1, 1)
+-- smiley_monitor.lua
+local mon = peripheral.find("monitor")
 
-print("Animated Smiley Face")
-print("Press any key to stop...")
-print("")
-
-local frames = {
-    -- Frame 1: Both eyes open
-    [[
-       *******       
-     **       **     
-    *           *    
-   *  O       O  *   
-   *             *   
-   *    _____    *   
-    *           *    
-     **       **     
-       *******       
-    ]],
-    
-    -- Frame 2: Winking right eye
-    [[
-       *******       
-     **       **     
-    *           *    
-   *  O       -  *   
-   *             *   
-   *    _____    *   
-    *           *    
-     **       **     
-       *******       
-    ]],
-    
-    -- Frame 3: Winking left eye
-    [[
-       *******       
-     **       **     
-    *           *    
-   *  -       O  *   
-   *             *   
-   *    _____    *   
-    *           *    
-     **       **     
-       *******       
-    ]]
-}
-
-local running = true
-local frame = 1
-
--- Function to check for key press without blocking
-local function checkKey()
-    local event = os.pullEvent()
-    if event == "key" then
-        running = false
-    end
+if not mon then
+    print("No monitor connected!")
+    print("Place a monitor next to the computer")
+    return
 end
 
--- Animation loop
-while running do
-    -- Clear and draw
-    term.setCursorPos(1, 5)
-    print(frames[frame])
-    
-    -- Cycle frames
-    frame = frame + 1
-    if frame > #frames then
-        frame = 1
-    end
-    
-    -- Wait a bit (non-blocking)
-    sleep(0.5)
-    
-    -- Check for key press
-    if os.pullEventRaw("key") then
-        running = false
-    end
-end
+-- Set up monitor
+mon.setTextScale(2)  -- Make text bigger
+mon.setBackgroundColor(colors.black)
+mon.setTextColor(colors.yellow)
+mon.clear()
 
-term.clear()
-term.setCursorPos(1, 1)
-print("Animation stopped!")
+-- Get monitor size
+local width, height = mon.getSize()
+
+-- Calculate center position
+local centerX = math.floor(width / 2)
+local centerY = math.floor(height / 2)
+
+-- Draw smiley face in center
+mon.setCursorPos(centerX - 4, centerY - 3)
+mon.write("  *******  ")
+mon.setCursorPos(centerX - 4, centerY - 2)
+mon.write(" *       * ")
+mon.setCursorPos(centerX - 4, centerY - 1)
+mon.write("*  O   O  *")
+mon.setCursorPos(centerX - 4, centerY)
+mon.write("*         *")
+mon.setCursorPos(centerX - 4, centerY + 1)
+mon.write("*   ___   *")
+mon.setCursorPos(centerX - 4, centerY + 2)
+mon.write(" * \\___/ * ")
+mon.setCursorPos(centerX - 4, centerY + 3)
+mon.write("  *******  ")
+
+-- Add text below
+mon.setTextColor(colors.white)
+mon.setCursorPos(centerX - 5, centerY + 5)
+mon.write("Have a nice day! :)")
+
+print("Smiley displayed on monitor!")
