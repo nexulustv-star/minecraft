@@ -23,7 +23,6 @@ local texts = {
 }
 
 local current = 1
-local colors = {colors.white, colors.lightGray, colors.gray}
 
 print("Displaying messages...")
 print("Press Ctrl+T to stop")
@@ -34,25 +33,23 @@ while true do
     screen.clear()
     
     -- Get screen size
-    local width, height = screen.getSize()
+    local width, height
+    if peripheral.getType(screen) == "monitor" then
+        width, height = screen.getSize()
+    else
+        width, height = term.getSize()
+    end
+    
     local text = texts[current]
     
     -- Calculate center position
     local x = math.floor(width / 2 - #text / 2)
     local y = math.floor(height / 2)
     
-    -- Display text with simple effect
-    if current % 2 == 0 then
-        -- Even messages: show with border
-        screen.setTextColor(colors.white)
-        screen.setCursorPos(x - 1, y)
-        screen.write("[" .. text .. "]")
-    else
-        -- Odd messages: simple text
-        screen.setTextColor(colors.lightGray)
-        screen.setCursorPos(x, y)
-        screen.write(text)
-    end
+    -- Display text
+    screen.setTextColor(colors.white)
+    screen.setCursorPos(x, y)
+    screen.write(text)
     
     -- Show progress at bottom
     screen.setTextColor(colors.gray)
